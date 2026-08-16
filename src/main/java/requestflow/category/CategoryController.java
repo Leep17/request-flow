@@ -35,7 +35,7 @@ public class CategoryController {
     }
 
     @PatchMapping("/{id}")
-    public CategoryDto updateCategory(@Valid @PathVariable Long id, @RequestBody UpdateCategoryDto updateCategoryDto) {
+    public CategoryDto updateCategory(@PathVariable Long id, @Valid @RequestBody UpdateCategoryDto updateCategoryDto) {
         return CategoryMapper.toCategoryDto(categoryService.updateCategory(id, updateCategoryDto));
     }
 

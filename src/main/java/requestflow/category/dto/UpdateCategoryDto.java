@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateCategoryDto {
-    @NotBlank
-    @Size(max = 100)
+
+    @Size(min = 2, max = 100)
     private String name;
 
     @Size(max = 500)
