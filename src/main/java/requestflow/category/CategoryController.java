@@ -1,5 +1,6 @@
 package requestflow.category;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import requestflow.category.dto.CategoryDto;
@@ -29,12 +30,12 @@ public class CategoryController {
     }
 
     @PostMapping
-    public CategoryDto saveNewCategory(@RequestBody NewCategoryDto newCategoryDto) {
+    public CategoryDto saveNewCategory(@Valid @RequestBody NewCategoryDto newCategoryDto) {
         return CategoryMapper.toCategoryDto(categoryService.save(newCategoryDto));
     }
 
     @PatchMapping("/{id}")
-    public CategoryDto updateCategory(@PathVariable Long id, @RequestBody UpdateCategoryDto updateCategoryDto) {
+    public CategoryDto updateCategory(@Valid @PathVariable Long id, @RequestBody UpdateCategoryDto updateCategoryDto) {
         return CategoryMapper.toCategoryDto(categoryService.updateCategory(id, updateCategoryDto));
     }
 

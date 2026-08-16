@@ -10,6 +10,7 @@ import requestflow.category.dto.UpdateCategoryDto;
 import requestflow.exception.ConflictException;
 import requestflow.exception.NotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Service
@@ -29,6 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (newCategoryDto.getDescription() != null && !newCategoryDto.getDescription().isBlank()) {
             category.setDescription(newCategoryDto.getDescription());
         }
+        category.setCreatedAt(LocalDateTime.now());
         return categoryRepository.save(category);
     }
 
@@ -46,6 +48,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category updateCategory(Long id, UpdateCategoryDto updateCategoryDto) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Категория с id=" + id + " не найдена"));
+        if (categoryRepository.existsByNameAndIdNot(updateCategoryDto.getName(), id)) {
+            throw new ConflictException("Категория с названием " + updateCategoryDto.getName() + " уже существует");
+        }
         if (updateCategoryDto.getName() != null) {
            category.setName(updateCategoryDto.getName());
         }
