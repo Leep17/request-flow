@@ -58,7 +58,7 @@ public class RequestServiceImpl implements RequestService {
             throw  new ConflictException("Заявка " + id + " уже согласована");
         }
 
-        if (updateRequestDto.getDescription() != null && !updateRequestDto.getDescription().isBlank()) {
+        if (updateRequestDto.getDescription() != null) {
             request.setDescription(updateRequestDto.getDescription());
         } else {
             throw  new ConflictException("Заявка " + id + "  не должна быть с пустым описанием!");
@@ -71,7 +71,7 @@ public class RequestServiceImpl implements RequestService {
         }
 
         if (updateRequestDto.getCategoryId() != null) {
-            Category category = categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Категория с id=" + updateRequestDto.getCategoryId() + " не найдена"));
+            Category category = categoryRepository.findById(updateRequestDto.getCategoryId()).orElseThrow(() -> new NotFoundException("Категория с id=" + updateRequestDto.getCategoryId() + " не найдена"));
             request.setCategory(category);
         }
         request.setUpdatedAt(LocalDateTime.now());
@@ -92,7 +92,10 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     @Override
     public void deleteById(Long id) {
-        requestRepository.findById(id).orElseThrow(() -> new NotFoundException("Заявки с id=" + id + " не найдена"));
+        Request request = requestRepository.findById(id).orElseThrow(() -> new NotFoundException("Заявки с id=" + id + " не найдена"));
+        if (!request.getStatus().equals(RequestStatus.DRAFT)) {
+            throw  new ConflictException("Заявка " + id + " уже согласована");
+        }
         requestRepository.deleteById(id);
     }
 }

@@ -11,11 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateRequestDto {
 
-    @NotBlank
     @Size(min = 3, max = 150)
     private String title;
 
-    @NotBlank
     @Size(min = 5, max = 2000)
     private String description;
 
