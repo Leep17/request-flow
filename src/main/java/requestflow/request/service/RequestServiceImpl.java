@@ -37,6 +37,7 @@ public class RequestServiceImpl implements RequestService {
         request.setDescription(newRequestDto.getDescription());
         request.setStatus(RequestStatus.DRAFT);
         request.setCreatedAt(LocalDateTime.now());
+        request.setUpdatedAt(LocalDateTime.now());
         request.setCategory(categoryRepository.findById(newRequestDto.getCategoryId())
                 .orElseThrow(() -> new NotFoundException("Категория с id=" + newRequestDto.getCategoryId() + " не найдена")));
         request.setAuthor(userRepository.findById(newRequestDto.getAuthorId())
@@ -77,7 +78,6 @@ public class RequestServiceImpl implements RequestService {
             request.setCategory(category);
         }
         request.setUpdatedAt(LocalDateTime.now());
-        request.setUpdatedAt(LocalDateTime.now());
         return request;
     }
 
@@ -89,6 +89,7 @@ public class RequestServiceImpl implements RequestService {
               throw  new ConflictException("Заявка " + id + " уже согласована");
           }
         request.setStatus(RequestStatus.SUBMITTED);
+        request.setUpdatedAt(LocalDateTime.now());
         return request;
     }
 
