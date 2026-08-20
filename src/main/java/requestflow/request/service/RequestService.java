@@ -17,6 +17,14 @@ public interface RequestService {
 
     Request submitRequest(Long id);
 
+    Request reviewRequest(Long id);
+
+    Request approveRequest(Long id);
+
+    Request cancelRequest(Long id);
+
+    Request rejectRequest(Long id);
+
     void deleteById(Long id);
 
 }

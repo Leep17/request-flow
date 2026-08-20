@@ -95,6 +95,64 @@ public class RequestServiceImpl implements RequestService {
 
     @Transactional
     @Override
+    public Request reviewRequest(Long id) {
+        Request request = requestRepository.findById(id).orElseThrow(() -> new NotFoundException("Заявки с id=" + id + " не найдена"));
+        if (!request.getStatus().equals(RequestStatus.SUBMITTED)) {
+            throw  new ConflictException("Заявка " + id + " должна быть согласована");
+        }
+        request.setStatus(RequestStatus.IN_REVIEW);
+        request.setUpdatedAt(LocalDateTime.now());
+        return request;
+    }
+
+    @Transactional
+    @Override
+    public Request approveRequest(Long id) {
+        Request request = requestRepository.findById(id).orElseThrow(() -> new NotFoundException("Заявки с id=" + id + " не найдена"));
+        if (!request.getStatus().equals(RequestStatus.IN_REVIEW)) {
+            throw  new ConflictException("Заявка " + id + " должна быть на рассмотрении");
+        }
+        request.setStatus(RequestStatus.APPROVED);
+        request.setUpdatedAt(LocalDateTime.now());
+        return request;
+    }
+
+    @Transactional
+    @Override
+    public Request rejectRequest(Long id) {
+        Request request = requestRepository.findById(id).orElseThrow(() -> new NotFoundException("Заявки с id=" + id + " не найдена"));
+
+        if (request.getStatus().equals(RequestStatus.REJECTED)) {
+            throw  new ConflictException("Заявка " + id + " уже отклонена!");
+        }
+
+        if (request.getStatus().equals(RequestStatus.IN_REVIEW)) {
+            request.setStatus(RequestStatus.REJECTED);
+            request.setUpdatedAt(LocalDateTime.now());
+        }
+
+        return request;
+    }
+
+    @Transactional
+    @Override
+    public Request cancelRequest(Long id) {
+        Request request = requestRepository.findById(id).orElseThrow(() -> new NotFoundException("Заявки с id=" + id + " не найдена"));
+
+        if (request.getStatus().equals(RequestStatus.CANCELLED) || request.getStatus().equals(RequestStatus.REJECTED)) {
+            throw  new ConflictException("Заявка " + id + " уже отменена!");
+        }
+
+        if (request.getStatus().equals(RequestStatus.DRAFT) || request.getStatus().equals(RequestStatus.SUBMITTED)) {
+            request.setStatus(RequestStatus.CANCELLED);
+            request.setUpdatedAt(LocalDateTime.now());
+        }
+
+        return request;
+    }
+
+    @Transactional
+    @Override
     public void deleteById(Long id) {
         Request request = requestRepository.findById(id).orElseThrow(() -> new NotFoundException("Заявки с id=" + id + " не найдена"));
         if (!request.getStatus().equals(RequestStatus.DRAFT)) {
