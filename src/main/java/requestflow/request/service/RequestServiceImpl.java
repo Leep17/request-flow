@@ -59,21 +59,24 @@ public class RequestServiceImpl implements RequestService {
         }
 
         if (updateRequestDto.getDescription() != null) {
+            if (updateRequestDto.getDescription().isBlank()) {
+                throw new ConflictException("Описание не может быть пустым");
+            }
             request.setDescription(updateRequestDto.getDescription());
-        } else {
-            throw  new ConflictException("Заявка " + id + "  не должна быть с пустым описанием!");
         }
 
-        if (updateRequestDto.getTitle() != null && !updateRequestDto.getTitle().isBlank()) {
+        if (updateRequestDto.getTitle() != null) {
+            if (updateRequestDto.getTitle().isBlank()) {
+                throw new ConflictException("Название не может быть пустым");
+            }
             request.setTitle(updateRequestDto.getTitle());
-        } else {
-            throw  new ConflictException("Заявка " + id + "  не должна быть с пустым заголовком!");
         }
 
         if (updateRequestDto.getCategoryId() != null) {
             Category category = categoryRepository.findById(updateRequestDto.getCategoryId()).orElseThrow(() -> new NotFoundException("Категория с id=" + updateRequestDto.getCategoryId() + " не найдена"));
             request.setCategory(category);
         }
+        request.setUpdatedAt(LocalDateTime.now());
         request.setUpdatedAt(LocalDateTime.now());
         return request;
     }
