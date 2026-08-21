@@ -39,6 +39,26 @@ public class RequestController {
         return RequestMapper.toRequestDto(requestService.submitRequest(id));
     }
 
+    @PostMapping("/{id}/review")
+    public RequestDto reviewRequest(@PathVariable Long id) {
+        return  RequestMapper.toRequestDto(requestService.reviewRequest(id));
+    }
+
+    @PostMapping("/{id}/approve")
+    public RequestDto approveRequest(@PathVariable Long id) {
+        return  RequestMapper.toRequestDto(requestService.approveRequest(id));
+    }
+
+    @PostMapping("/{id}/reject")
+    public RequestDto rejectRequest(@PathVariable Long id) {
+        return RequestMapper.toRequestDto(requestService.rejectRequest(id));
+    }
+
+    @PostMapping("/{id}/cancel")
+    public RequestDto cancelRequest(@PathVariable Long id) {
+        return RequestMapper.toRequestDto(requestService.cancelRequest(id));
+    }
+
     @PatchMapping("/{id}")
     public RequestDto updateById(@PathVariable Long id, @Valid @RequestBody UpdateRequestDto updateRequestDto) {
         return RequestMapper.toRequestDto(requestService.update(id, updateRequestDto));
