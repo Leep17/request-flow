@@ -122,14 +122,12 @@ public class RequestServiceImpl implements RequestService {
     public Request rejectRequest(Long id) {
         Request request = requestRepository.findById(id).orElseThrow(() -> new NotFoundException("Заявки с id=" + id + " не найдена"));
 
-        if (request.getStatus().equals(RequestStatus.REJECTED)) {
-            throw  new ConflictException("Заявка " + id + " уже отклонена!");
+        if (!request.getStatus().equals(RequestStatus.IN_REVIEW)) {
+            throw  new ConflictException("Заявка " + id + " должна быть на рассмотрении");
         }
 
-        if (request.getStatus().equals(RequestStatus.IN_REVIEW)) {
-            request.setStatus(RequestStatus.REJECTED);
-            request.setUpdatedAt(LocalDateTime.now());
-        }
+        request.setStatus(RequestStatus.REJECTED);
+        request.setUpdatedAt(LocalDateTime.now());
 
         return request;
     }
@@ -139,14 +137,12 @@ public class RequestServiceImpl implements RequestService {
     public Request cancelRequest(Long id) {
         Request request = requestRepository.findById(id).orElseThrow(() -> new NotFoundException("Заявки с id=" + id + " не найдена"));
 
-        if (request.getStatus().equals(RequestStatus.CANCELLED) || request.getStatus().equals(RequestStatus.REJECTED)) {
-            throw  new ConflictException("Заявка " + id + " уже отменена!");
+        if (!request.getStatus().equals(RequestStatus.DRAFT) && !request.getStatus().equals(RequestStatus.SUBMITTED)) {
+            throw  new ConflictException("Заявка " + id + " должна иметь статус DRAFT или SUBMITTED!");
         }
 
-        if (request.getStatus().equals(RequestStatus.DRAFT) || request.getStatus().equals(RequestStatus.SUBMITTED)) {
-            request.setStatus(RequestStatus.CANCELLED);
-            request.setUpdatedAt(LocalDateTime.now());
-        }
+        request.setStatus(RequestStatus.CANCELLED);
+        request.setUpdatedAt(LocalDateTime.now());
 
         return request;
     }
