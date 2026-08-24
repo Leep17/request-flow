@@ -37,6 +37,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setAuthor(author);
         comment.setRequest(request);
         comment.setCreatedAt(LocalDateTime.now());
+        comment.setUpdatedAt(LocalDateTime.now());
         return commentRepository.save(comment);
     }
 
