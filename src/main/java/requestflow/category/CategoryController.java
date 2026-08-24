@@ -2,6 +2,7 @@ package requestflow.category;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import requestflow.category.dto.CategoryDto;
 import requestflow.category.dto.NewCategoryDto;
@@ -25,11 +26,13 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto getById(@PathVariable Long id) {
         return CategoryMapper.toCategoryDto(categoryService.getById(id));
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto saveNewCategory(@Valid @RequestBody NewCategoryDto newCategoryDto) {
         return CategoryMapper.toCategoryDto(categoryService.save(newCategoryDto));
     }
