@@ -2,7 +2,6 @@ package requestflow.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import requestflow.user.dto.NewUserDto;
 import requestflow.user.dto.UserDto;
@@ -30,7 +29,6 @@ public class UserController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public UserDto saveNewUser(@Valid @RequestBody NewUserDto newUserDto) {
         return UserMapper.toUserDto(userService.save(newUserDto));
     }

@@ -31,7 +31,7 @@ public class CommentController {
 
     @PostMapping("/comments")
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentDto saveNewComment(@RequestBody NewCommentDto newCommentDto) {
+    public CommentDto saveNewComment(@Valid @RequestBody NewCommentDto newCommentDto) {
         return CommentMapper.toCommentDto(commentService.save(newCommentDto));
     }
 

@@ -49,7 +49,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment updateById(Long id, UpdateCommentDto updateCommentDto) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id=" + id + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Комментарий с id=" + id + " не найден"));
 
         if (updateCommentDto.getText() != null) {
             if (updateCommentDto.getText().isBlank()) {
@@ -71,7 +71,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteId(Long id) {
         commentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id=" + id + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Комментарий с id=" + id + " не найден"));
 
         commentRepository.deleteById(id);
     }

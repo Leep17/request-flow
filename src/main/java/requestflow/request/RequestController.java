@@ -2,7 +2,6 @@ package requestflow.request;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import requestflow.request.dto.NewRequestDto;
 import requestflow.request.dto.RequestDto;
@@ -31,37 +30,31 @@ public class RequestController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public RequestDto saveNewRequest(@Valid @RequestBody NewRequestDto newRequestDto) {
         return RequestMapper.toRequestDto(requestService.save(newRequestDto));
     }
 
     @PostMapping("/{id}/submit")
-    @ResponseStatus(HttpStatus.CREATED)
     public RequestDto submitRequest(@PathVariable Long id) {
         return RequestMapper.toRequestDto(requestService.submitRequest(id));
     }
 
     @PostMapping("/{id}/review")
-    @ResponseStatus(HttpStatus.CREATED)
     public RequestDto reviewRequest(@PathVariable Long id) {
         return  RequestMapper.toRequestDto(requestService.reviewRequest(id));
     }
 
     @PostMapping("/{id}/approve")
-    @ResponseStatus(HttpStatus.CREATED)
     public RequestDto approveRequest(@PathVariable Long id) {
         return  RequestMapper.toRequestDto(requestService.approveRequest(id));
     }
 
     @PostMapping("/{id}/reject")
-    @ResponseStatus(HttpStatus.CREATED)
     public RequestDto rejectRequest(@PathVariable Long id) {
         return RequestMapper.toRequestDto(requestService.rejectRequest(id));
     }
 
     @PostMapping("/{id}/cancel")
-    @ResponseStatus(HttpStatus.CREATED)
     public RequestDto cancelRequest(@PathVariable Long id) {
         return RequestMapper.toRequestDto(requestService.cancelRequest(id));
     }
