@@ -12,6 +12,8 @@ import requestflow.request.RequestStatus;
 import requestflow.request.dto.NewRequestDto;
 import requestflow.request.dto.UpdateRequestDto;
 import requestflow.request.repository.RequestRepository;
+import requestflow.statushistory.StatusHistory;
+import requestflow.statushistory.service.StatusHistoryService;
 import requestflow.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -23,6 +25,7 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final StatusHistoryService statusHistoryService;
 
     @Override
     public Collection<Request> getAll() {
@@ -43,7 +46,16 @@ public class RequestServiceImpl implements RequestService {
         request.setAuthor(userRepository.findById(newRequestDto.getAuthorId())
                 .orElseThrow(() -> new NotFoundException("Пользователь с id=" + newRequestDto.getAuthorId() + " не найден")));
 
-        return requestRepository.save(request);
+        requestRepository.save(request);
+
+        StatusHistory statusHistory = new StatusHistory();
+        statusHistory.setRequest(request);
+        statusHistory.setNewStatus(request.getStatus());
+        statusHistory.setChangedAt(request.getUpdatedAt());
+
+        statusHistoryService.save(statusHistory);
+
+        return request;
     }
 
     @Override
@@ -90,6 +102,15 @@ public class RequestServiceImpl implements RequestService {
           }
         request.setStatus(RequestStatus.SUBMITTED);
         request.setUpdatedAt(LocalDateTime.now());
+
+        StatusHistory statusHistory = new StatusHistory();
+        statusHistory.setRequest(request);
+        statusHistory.setOldStatus(RequestStatus.DRAFT);
+        statusHistory.setNewStatus(request.getStatus());
+        statusHistory.setChangedAt(request.getUpdatedAt());
+
+        statusHistoryService.save(statusHistory);
+
         return request;
     }
 
@@ -102,6 +123,15 @@ public class RequestServiceImpl implements RequestService {
         }
         request.setStatus(RequestStatus.IN_REVIEW);
         request.setUpdatedAt(LocalDateTime.now());
+
+        StatusHistory statusHistory = new StatusHistory();
+        statusHistory.setRequest(request);
+        statusHistory.setOldStatus(RequestStatus.SUBMITTED);
+        statusHistory.setNewStatus(request.getStatus());
+        statusHistory.setChangedAt(request.getUpdatedAt());
+
+        statusHistoryService.save(statusHistory);
+
         return request;
     }
 
@@ -114,6 +144,14 @@ public class RequestServiceImpl implements RequestService {
         }
         request.setStatus(RequestStatus.APPROVED);
         request.setUpdatedAt(LocalDateTime.now());
+
+        StatusHistory statusHistory = new StatusHistory();
+        statusHistory.setRequest(request);
+        statusHistory.setOldStatus(RequestStatus.IN_REVIEW);
+        statusHistory.setNewStatus(request.getStatus());
+        statusHistory.setChangedAt(request.getUpdatedAt());
+
+        statusHistoryService.save(statusHistory);
         return request;
     }
 
@@ -128,6 +166,11 @@ public class RequestServiceImpl implements RequestService {
 
         request.setStatus(RequestStatus.REJECTED);
         request.setUpdatedAt(LocalDateTime.now());
+        statusHistoryService.save(new StatusHistory(id,
+                request,
+                RequestStatus.IN_REVIEW,
+                request.getStatus(),
+                request.getUpdatedAt()));
 
         return request;
     }
@@ -140,9 +183,13 @@ public class RequestServiceImpl implements RequestService {
         if (!request.getStatus().equals(RequestStatus.DRAFT) && !request.getStatus().equals(RequestStatus.SUBMITTED)) {
             throw  new ConflictException("Заявка " + id + " должна иметь статус DRAFT или SUBMITTED!");
         }
-
-        request.setStatus(RequestStatus.CANCELLED);
         request.setUpdatedAt(LocalDateTime.now());
+        statusHistoryService.save(new StatusHistory(id,
+                request,
+                request.getStatus(),
+                RequestStatus.CANCELLED,
+                request.getUpdatedAt()));
+        request.setStatus(RequestStatus.CANCELLED);
 
         return request;
     }

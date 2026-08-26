@@ -8,6 +8,8 @@ import requestflow.request.dto.RequestDto;
 import requestflow.request.dto.UpdateRequestDto;
 import requestflow.request.mapper.RequestMapper;
 import requestflow.request.service.RequestService;
+import requestflow.statushistory.dto.StatusHistoryDto;
+import requestflow.statushistory.service.StatusHistoryService;
 
 import java.util.List;
 
@@ -16,6 +18,7 @@ import java.util.List;
 @RequestMapping("/requests")
 public class RequestController {
     private final RequestService requestService;
+    private final StatusHistoryService statusHistoryService;
 
     @GetMapping
     public List<RequestDto> getAll() {
@@ -27,6 +30,12 @@ public class RequestController {
     @GetMapping("/{id}")
     public RequestDto getById(@PathVariable Long id) {
         return RequestMapper.toRequestDto(requestService.getById(id));
+    }
+
+    @GetMapping("/{requestId}/history")
+    public List<StatusHistoryDto> getHistoryByRequestId(@PathVariable Long requestId) {
+        return statusHistoryService.getAllByRequestId(requestId).stream()
+                .toList();
     }
 
     @PostMapping
