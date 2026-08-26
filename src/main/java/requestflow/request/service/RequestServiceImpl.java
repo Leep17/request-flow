@@ -171,8 +171,7 @@ public class RequestServiceImpl implements RequestService {
         requestRepository.deleteById(id);
     }
 
-    @Transactional
-    public void newStatusHistory(Request request, RequestStatus oldRequestStatus, RequestStatus newRequestStatus) {
+    private void newStatusHistory(Request request, RequestStatus oldRequestStatus, RequestStatus newRequestStatus) {
         StatusHistory statusHistory = new StatusHistory();
         statusHistory.setRequest(request);
         statusHistory.setOldStatus(oldRequestStatus);
