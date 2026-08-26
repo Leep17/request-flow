@@ -34,6 +34,6 @@ public class StatusHistory {
     @Column(name = "new_status", nullable = false)
     private RequestStatus newStatus;
 
-    @Column(name = "changed_at", nullable = false)
+    @Column(name = "changed_at")
     private LocalDateTime changedAt;
 }
