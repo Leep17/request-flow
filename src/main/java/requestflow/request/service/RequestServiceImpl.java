@@ -13,7 +13,6 @@ import requestflow.request.dto.NewRequestDto;
 import requestflow.request.dto.UpdateRequestDto;
 import requestflow.request.repository.RequestRepository;
 import requestflow.statushistory.StatusHistory;
-import requestflow.statushistory.dto.StatusHistoryDto;
 import requestflow.statushistory.service.StatusHistoryService;
 import requestflow.user.repository.UserRepository;
 
