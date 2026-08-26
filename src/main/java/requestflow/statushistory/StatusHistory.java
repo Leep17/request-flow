@@ -23,7 +23,7 @@ public class StatusHistory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "request_id")
+    @JoinColumn(name = "request_id", nullable = false)
     private Request request;
 
     @Enumerated(EnumType.STRING)
@@ -34,6 +34,6 @@ public class StatusHistory {
     @Column(name = "new_status", nullable = false)
     private RequestStatus newStatus;
 
-    @Column(name = "changed_at")
+    @Column(name = "changed_at", nullable = false)
     private LocalDateTime changedAt;
 }

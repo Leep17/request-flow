@@ -41,6 +41,6 @@ CREATE TABLE IF NOT EXISTS status_history (
      request_id BIGINT NOT NULL,
      old_status VARCHAR(20),
      new_status VARCHAR(20) NOT NULL,
-     changed_at TIMESTAMP,
+     changed_at TIMESTAMP NOT NULL,
      FOREIGN KEY (request_id) REFERENCES requests (id)
 );
