@@ -1,13 +1,15 @@
 package requestflow.request.service;
 
+import org.springframework.data.domain.Page;
 import requestflow.request.Request;
+import requestflow.request.RequestStatus;
 import requestflow.request.dto.NewRequestDto;
 import requestflow.request.dto.UpdateRequestDto;
 
 import java.util.Collection;
 
 public interface RequestService {
-    Collection<Request> getAll();
+    Page<Request> getAll(RequestStatus status, Long categoryId, Long authorId, String sort, int page, int size);
 
     Request save(NewRequestDto newRequestDto);
 

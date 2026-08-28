@@ -1,7 +1,14 @@
 package requestflow.request;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import requestflow.request.dto.NewRequestDto;
 import requestflow.request.dto.RequestDto;
@@ -21,10 +28,18 @@ public class RequestController {
     private final StatusHistoryService statusHistoryService;
 
     @GetMapping
-    public List<RequestDto> getAll() {
-        return requestService.getAll().stream()
-                .map(RequestMapper::toRequestDto)
-                .toList();
+    public Page<RequestDto> getAll(@PositiveOrZero @RequestParam(defaultValue = "0") int page,
+                                   @Max (100) @Min (1) @RequestParam(defaultValue = "20") int size,
+                                   @RequestParam(required = false) RequestStatus status,
+                                   @RequestParam(required = false) Long categoryId,
+                                   @RequestParam(required = false) Long authorId,
+                                   @Pattern(
+                                           regexp = "^(id|createdAt|updatedAt|title)(,(asc|desc))?$",
+                                           message = "Сортировка должна производиться только по этим параметрам: id, createdAt, updatedAt, title"
+                                   ) @RequestParam(defaultValue = "createdAt,desc") String sort) {
+
+        return requestService.getAll(status, categoryId, authorId, sort, page, size)
+                .map(RequestMapper::toRequestDto);
     }
 
     @GetMapping("/{id}")

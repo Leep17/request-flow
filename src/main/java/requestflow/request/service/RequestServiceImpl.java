@@ -2,6 +2,10 @@ package requestflow.request.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import requestflow.category.Category;
 import requestflow.category.repository.CategoryRepository;
@@ -17,7 +21,9 @@ import requestflow.statushistory.service.StatusHistoryService;
 import requestflow.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.List;
+
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +34,49 @@ public class RequestServiceImpl implements RequestService {
     private final StatusHistoryService statusHistoryService;
 
     @Override
-    public Collection<Request> getAll() {
-        return requestRepository.findAll();
+    public Page<Request> getAll(RequestStatus status, Long categoryId, Long authorId, String sort, int page, int size) {
+
+        int index;
+        String sortName="";
+        Sort.Direction direction = Sort.Direction.ASC;
+        if (sort.contains(",")) {
+            index = sort.indexOf(",");
+            sortName = sort.substring(0, index);
+            String sortDir = sort.substring(index + 1);
+            direction =
+                    Sort.Direction.fromString(sortDir);
+        } else {
+            sortName = sort;
+        }
+
+        Specification<Request> specification = (root, query, criteriaBuilder) -> {
+
+            Predicate predicate = criteriaBuilder.conjunction();
+
+            if (status != null) {
+              predicate = criteriaBuilder.and(predicate,
+                      criteriaBuilder.equal(
+                      root.get("status"),
+                      status));
+            }
+
+            if (categoryId != null) {
+                predicate = criteriaBuilder.and(predicate,
+                        criteriaBuilder.equal(
+                                root.get("category").get("id"),
+                                categoryId));
+            }
+
+            if (authorId != null) {
+                predicate = criteriaBuilder.and(predicate,
+                        criteriaBuilder.equal(
+                                root.get("author").get("id"),
+                                authorId));
+            }
+            return predicate;
+        };
+
+        return requestRepository.findAll(specification, PageRequest.of(page, size, direction, sortName));
     }
 
     @Transactional
