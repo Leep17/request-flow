@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -35,5 +36,13 @@ public class ErrorHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         return new ErrorResponse(400, "Bad Request", message, LocalDateTime.now().toString(), request.getRequestURI());
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleHandlerMethodValidationException(
+            HandlerMethodValidationException e,
+            HttpServletRequest request) {
+        return new ErrorResponse(400, "Bad Request", "Некорректные параметры запроса", LocalDateTime.now().toString(), request.getRequestURI());
     }
 }
