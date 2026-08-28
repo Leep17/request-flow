@@ -21,7 +21,6 @@ import requestflow.statushistory.service.StatusHistoryService;
 import requestflow.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import jakarta.persistence.criteria.Predicate;
 
@@ -37,7 +36,7 @@ public class RequestServiceImpl implements RequestService {
     public Page<Request> getAll(RequestStatus status, Long categoryId, Long authorId, String sort, int page, int size) {
 
         int index;
-        String sortName="";
+        String sortName = "";
         Sort.Direction direction = Sort.Direction.ASC;
         if (sort.contains(",")) {
             index = sort.indexOf(",");

@@ -6,8 +6,6 @@ import requestflow.request.RequestStatus;
 import requestflow.request.dto.NewRequestDto;
 import requestflow.request.dto.UpdateRequestDto;
 
-import java.util.Collection;
-
 public interface RequestService {
     Page<Request> getAll(RequestStatus status, Long categoryId, Long authorId, String sort, int page, int size);
 
