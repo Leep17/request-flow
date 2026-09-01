@@ -12,6 +12,7 @@ import requestflow.category.repository.CategoryRepository;
 import requestflow.exception.ConflictException;
 import requestflow.exception.NotFoundException;
 import requestflow.request.Request;
+import requestflow.request.RequestPriority;
 import requestflow.request.RequestStatus;
 import requestflow.request.dto.NewRequestDto;
 import requestflow.request.dto.UpdateRequestDto;
@@ -92,6 +93,7 @@ public class RequestServiceImpl implements RequestService {
         request.setAuthor(userRepository.findById(newRequestDto.getAuthorId())
                 .orElseThrow(() -> new NotFoundException("Пользователь с id=" + newRequestDto.getAuthorId() + " не найден")));
 
+        request.setPriority(RequestPriority.NORMAL);
         return requestRepository.save(request);
     }
 
