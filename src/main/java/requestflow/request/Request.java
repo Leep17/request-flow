@@ -46,4 +46,8 @@ public class Request {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority", nullable = false)
+    private RequestPriority priority;
+
 }
