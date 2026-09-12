@@ -1,0 +1,139 @@
+# Раздел, в котором описываются контейнеры/сервисы,
+# которые Docker Compose должен создать и запустить.
+services:
+
+  # Имя сервиса PostgreSQL.
+  # Внутри сети Docker другие сервисы могут обращаться к нему
+  # по имени "postgres", например postgres:5432.
+  postgres:
+
+    # Готовый Docker image PostgreSQL версии 16.
+    # Из этого image Compose создаст контейнер с PostgreSQL.
+    image: postgres:16
+
+    # Переменные окружения, которые будут переданы
+    # внутрь PostgreSQL-контейнера.
+    environment:
+
+      # Имя базы данных, которую PostgreSQL создаст
+      # при первоначальной инициализации.
+      # ${POSTGRES_DB} берётся из файла .env.
+      POSTGRES_DB: ${POSTGRES_DB}
+
+      # Пользователь PostgreSQL.
+      # Значение берётся из .env.
+      POSTGRES_USER: ${POSTGRES_USER}
+
+      # Пароль пользователя PostgreSQL.
+      # Значение берётся из .env, поэтому пароль
+      # не хранится непосредственно в docker-compose.yml.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    # Подключение постоянного хранилища к контейнеру.
+    volumes:
+
+      # pgdata — имя Docker volume.
+      # /var/lib/postgresql/data — каталог внутри контейнера,
+      # куда PostgreSQL записывает свои данные.
+      #
+      # Благодаря volume данные не пропадут,
+      # если контейнер PostgreSQL удалить и создать заново.
+      - pgdata:/var/lib/postgresql/data
+
+    # Проверка состояния PostgreSQL.
+    # Нужна, чтобы понять не просто "контейнер запущен",
+    # а "сама PostgreSQL уже готова принимать подключения".
+    healthcheck:
+
+      # Команда, которую Docker периодически запускает
+      # внутри PostgreSQL-контейнера.
+      #
+      # pg_isready — утилита PostgreSQL для проверки готовности БД.
+      # -U — пользователь.
+      # -d — база данных.
+      #
+      # CMD-SHELL означает, что команда выполняется через shell.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+
+      # Как часто выполнять проверку.
+      interval: 5s
+
+      # Сколько максимум ждать выполнения одной проверки.
+      # Если за 5 секунд ответа нет — проверка считается неуспешной.
+      timeout: 5s
+
+      # Сколько неудачных проверок допускается,
+      # прежде чем контейнер получит статус unhealthy.
+      retries: 5
+
+
+  # Сервис нашего Spring Boot приложения.
+  app:
+
+    # Собрать Docker image самостоятельно.
+    #
+    # "." означает:
+    # использовать текущую директорию как build context
+    # и искать Dockerfile в текущей директории.
+    build: .
+
+    # Проброс портов между Mac и контейнером.
+    ports:
+
+      # Формат:
+      # "порт_на_хосте:порт_в_контейнере"
+      #
+      # localhost:8080 на Mac
+      #        ↓
+      # порт 8080 контейнера Spring Boot.
+      - "8080:8080"
+
+    # Переменные окружения,
+    # которые передаются Spring Boot приложению.
+    environment:
+
+      # JDBC URL для подключения Spring Boot к PostgreSQL.
+      #
+      # ВАЖНО:
+      # здесь используется "postgres", а не localhost.
+      #
+      # postgres — имя сервиса выше.
+      # Оба контейнера находятся в одной Compose-сети,
+      # поэтому Docker позволяет обращаться к PostgreSQL
+      # по имени сервиса.
+      #
+      # 5432 — порт PostgreSQL внутри Docker-сети.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+
+      # Пользователь БД, которого получит Spring Boot.
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+
+      # Пароль БД, которого получит Spring Boot.
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+
+    # Зависимость приложения от PostgreSQL.
+    depends_on:
+
+      # Наш app зависит от сервиса postgres.
+      postgres:
+
+        # Запускать app только после того,
+        # как healthcheck PostgreSQL станет успешным.
+        #
+        # То есть не просто когда контейнер postgres стартовал,
+        # а когда сама БД действительно готова.
+        condition: service_healthy
+
+
+# Глобальный раздел Docker volumes,
+# используемых сервисами этого Compose-проекта.
+volumes:
+
+  # Объявляем named volume с логическим именем pgdata.
+  #
+  # Так как здесь больше никаких настроек нет,
+  # Docker Compose сам создаст volume при необходимости.
+  #
+  # Обычно физическое имя получится примерно:
+  # request-flow_pgdata
+  pgdata:
